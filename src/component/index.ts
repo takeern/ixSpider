@@ -13,9 +13,10 @@ export default class Spider {
     public spider: any;
     public count: number;
     public changeTimes: number;
+    public searchError: boolean;
     constructor(config: IConfig) {
         this.bookName = config.bookName;
-        this.changeTimes = config.changeTimes || 5;
+        this.changeTimes = config.changeTimes || 0;
         this.type = SPIDERTYPES[0];
         this.count = 0;
         this.changeOrigin();
@@ -53,30 +54,48 @@ export default class Spider {
                         type: this.type,
                     };
                 }
-                default: return new Error(ERROR.COMMANDERROR);
+                default: throw new Error(ERROR.COMMANDERROR);
             }
         } catch (e) {
-            if (e.message === ERROR.COMMANDERROR) {
-                throw e;
-            } else {
-                this.count += 1;
-                if (this.count > this.changeTimes) {
-                    return new Error(ERROR.ORGINERROR);
+            switch (e.message) {
+                case(ERROR.COMMANDERROR): {
+                    throw e;
                 }
-                this.turnType();
-                this.run(command, str);
+                case(ERROR.PRASEHTML): {
+                    this.searchError = true;
+                }
+                default: {
+                    this.count += 1;
+                    if (this.count >= this.changeTimes) {
+                        if (this.searchError) {
+                            return {
+                                code: -1,
+                                data: ERROR.PRASEHTML,
+                                command,
+                            };
+                        } else {
+                            throw new Error(ERROR.ORGINERROR);
+                        }
+                    }
+                    this.turnType();
+                    await this.run(command, str);
+                }
             }
         }
     }
 
     public turnType() {
         const {length} = SPIDERTYPES;
-        if (this.type === SPIDERTYPES[length]) {
+        const lastType = this.type;
+        if (this.type === SPIDERTYPES[length - 1]) {
             this.type = SPIDERTYPES[0];
-            return;
+        } else {
+            const index = SPIDERTYPES.indexOf(this.type);
+            this.type = SPIDERTYPES[index + 1];
         }
-        const index = SPIDERTYPES.indexOf(this.type);
-        this.type = SPIDERTYPES[index + 1];
+        if (lastType === this.type) {
+            return false;
+        }
         this.changeOrigin();
     }
 

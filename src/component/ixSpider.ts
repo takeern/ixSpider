@@ -36,7 +36,7 @@ export default  class IxSpider extends ABSpider implements ISpider {
         });
         const inLength = this.indentif.length;
         const beginIndex = html.indexOf(this.indentif);
-        if (!beginIndex) {
+        if (beginIndex === -1) {
             throw new Error(ERROR.PRASEHTML);
         }
         const ns = html.slice(beginIndex + inLength);

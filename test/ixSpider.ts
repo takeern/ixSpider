@@ -3,8 +3,8 @@ chai.use(require('chai-as-promised'));
 import IxSpider from '../src/component/ixSpider';
 
 const bookname = '大道朝天';
-
 describe('ixSpider input bookname should renturn book number', function() {
+    this.timeout(15000);
     it('ixSpider input bookname should return book number', function(done) {
         const spider = new IxSpider({
             bookName: bookname,
@@ -25,10 +25,26 @@ describe('ixSpider input bookname should renturn book number', function() {
         });
     });
 
-    it('ixSpider input bookname should return book 某一章节', function() {
+    it('ixSpider input bookname should return book 某一章节', function(done) {
         const spider = new IxSpider({
             bookName: bookname,
         });
-        return chai.expect(spider.getBookData('p2.html')).to.eventually.be.match(/[/s]*.*[/s]*/);
+        spider.getBookData('p2.html').then((data) => {
+            chai.expect(data).to.be.match(/[/s]*.*[/s]*/);
+            done();
+        });
+    });
+
+    it('ixSpider input error book return error', function(done) {
+        const bookName = 'dsadas';
+        const spider = new IxSpider({
+            bookName: bookName,
+        });
+        spider.searchBook().then((data) => {
+            done();
+        }).catch((e) => {
+            chai.expect(e.message).to.be.equal('parse html error can not find book number');
+            done();
+        });
     });
 });
