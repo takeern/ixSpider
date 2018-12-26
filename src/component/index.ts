@@ -14,7 +14,7 @@ export default class Spider {
     public count: number;
     public changeTimes: number;
     public searchError: boolean;
-    constructor(config: IConfig) {
+    constructor(config?: IConfig) {
         this.bookName = config.bookName;
         this.changeTimes = config.changeTimes || 0;
         this.type = SPIDERTYPES[0];
@@ -102,9 +102,7 @@ export default class Spider {
     public changeOrigin() {
         switch (this.type) {
             case ('ixSpider'): {
-                return this.spider = new IxSpider({
-                    bookName: this.bookName,
-                });
+                return this.spider = new IxSpider();
             }
             default: throw new Error(ERROR.NOTHISTYPE);
         }

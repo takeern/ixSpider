@@ -1,7 +1,9 @@
-interface  ISpider {
-    bookName: string;
+interface IsearchConfig {
+    bookName?: string;
+    bookNumber?: string;
+    bookHref?: string;
 }
 
 export {
-    ISpider
+    IsearchConfig,
 };

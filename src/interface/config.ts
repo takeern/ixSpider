@@ -1,5 +1,5 @@
 interface IConfig {
-    bookName: string;
+    bookName?: string;
     changeTimes?: number;
 }
 
