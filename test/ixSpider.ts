@@ -20,7 +20,7 @@ describe('ixSpider input bookname should renturn book number', function() {
         spider.getBookList({
             bookNumber,
         }).then((data) => {
-            chai.expect(data).to.an.instanceof(Array);
+            chai.expect(data.bookList).to.an.instanceof(Array);
             done();
         });
     });
@@ -30,7 +30,7 @@ describe('ixSpider input bookname should renturn book number', function() {
             bookHref: 'p2.html',
             bookName,
         }).then((data) => {
-            chai.expect(data).to.be.match(/[/s]*.*[/s]*/);
+            chai.expect(data.bookData).to.be.match(/[/s]*.*[/s]*/);
             done();
         });
     });
