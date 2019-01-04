@@ -73,7 +73,10 @@ export default  class IxSpider extends ABSpider {
                 title: res[3],
             });
         }
-        return bookList;
+        return {
+            bookList,
+            bookNumber,
+        };
     }
     /**
      * 获取某章节数据
@@ -95,7 +98,10 @@ export default  class IxSpider extends ABSpider {
         });
         const re = /<div class="content">([\w\W]*?)<\/div>/g;
         const res = re.exec(html);
-        return res[1];
+        return {
+            bookData: res[1],
+            bookNumber,
+        };
     }
     /**
      * 下载整本书
