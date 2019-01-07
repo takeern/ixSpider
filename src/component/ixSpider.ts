@@ -7,7 +7,7 @@ import { ixdzs } from '../ulits/API';
 import ERROR from '../ulits/Error';
 
 // interface
-import { ISpiderConfig, IBookList } from '../interface/config';
+import { ISpiderConfig, IBookList, ISearchBook } from '../interface/config';
 import { IsearchConfig } from '../interface/Spider';
 import ABSpider from './Spider';
 
@@ -22,10 +22,10 @@ export default  class IxSpider extends ABSpider {
     public async searchBook(config: IsearchConfig) {
         // request
         const { bookName } = config;
+        const bookList: ISearchBook[] = [];
         if (!bookName) {
             throw new Error('bookname is undefined');
         }
-        const { indentif } = ixdzs;
         const html: string = await fetch(ixdzs.searchBookNumber + encodeURI(bookName), {
             method: 'GET',
         }).then((res) => {
@@ -34,24 +34,26 @@ export default  class IxSpider extends ABSpider {
             }
             return res.text();
         });
-        const inLength = indentif.length;
-        const beginIndex = html.indexOf(indentif);
-        if (beginIndex === -1) {
-            throw new Error(ERROR.PRASEHTML);
+        let res;
+        const re = /b_name"><a href="(.{1,}?)"[\s\S]{1,}?"_blank">(.{1,}?)<[\s\S]{1,}?p">(.{1,}?)<[\s\S]{1,}?b_intro">([\s\S]{1,}?)</g;
+        while ((res = re.exec(html)) !== null) {
+            bookList.push({
+                bookName: res[2],
+                bookNumber: res[1],
+                bookState: res[3],
+                bookIntro: res[4],
+            });
         }
-        const ns = html.slice(beginIndex + inLength);
-        const endIndex = ns.indexOf(' ');
-        const bookNumber = ns.slice(0, endIndex - 1);
-        return bookNumber;
+        return bookList;
     }
 
     /**
      * 获取书目录
      */
     public async getBookList(config: IsearchConfig) {
-        let bookNumber = config.bookNumber;
+        const bookNumber = config.bookNumber;
         if (!bookNumber) {
-            bookNumber = await this.searchBook(config);
+            throw new Error('bookNumber is undefined');
         }
         // /d/169/169208/#epub_down
         const arr = bookNumber.split('/');
@@ -83,12 +85,12 @@ export default  class IxSpider extends ABSpider {
      * @param str 某一章节对应的地址
      */
     public async getBookData(config: IsearchConfig) {
-        let bookNumber = config.bookNumber;
         if (!config.bookHref) {
             throw new Error('bookHref undefined');
         }
+        const bookNumber = config.bookNumber;
         if (!bookNumber) {
-            bookNumber = await this.searchBook(config);
+            throw new Error('bookNumber is undefined');
         }
         const arr = bookNumber.split('/');
         const html: string = await fetch(`${ixdzs.getList}${arr[2]}/${arr[3]}/${config.bookHref}`, {
@@ -107,9 +109,9 @@ export default  class IxSpider extends ABSpider {
      * 下载整本书
      */
     public async getBookAllData(config: IsearchConfig) {
-        let bookNumber = config.bookNumber;
+        const bookNumber = config.bookNumber;
         if (!bookNumber) {
-            bookNumber = await this.searchBook(config);
+            throw new Error('bookNumber is undefined');
         }
         const arr = bookNumber.split('/');
         const url = `${ixdzs.download}/down/${arr[3]}_1`;

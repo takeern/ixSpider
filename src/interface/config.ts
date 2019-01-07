@@ -23,11 +23,17 @@ interface IBookData {
     bookData: string;
 }
 // interface SpiderConfig
-
+interface ISearchBook {
+    bookNumber: string;
+    bookName: string;
+    bookIntro: string;
+    bookState: string;
+}
 export {
     ISpiderConfig,
     IBookListRes,
     IConfig,
     IBookData,
     IBookList,
+    ISearchBook,
 };

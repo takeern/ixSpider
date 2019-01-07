@@ -11,7 +11,8 @@ describe('ixSpider input bookname should renturn book number', function() {
         spider.searchBook({
             bookName,
         }).then((data) => {
-            chai.expect(data).to.be.equal('/d/169/169208/#txt_down');
+            console.log(data)
+            chai.expect(data[0].bookNumber).to.be.equal('/d/169/169208/#txt_down');
             done();
         });
     });
@@ -28,7 +29,7 @@ describe('ixSpider input bookname should renturn book number', function() {
     it('ixSpider input bookname should return book 某一章节', function(done) {
         spider.getBookData({
             bookHref: 'p2.html',
-            bookName,
+            bookNumber,
         }).then((data) => {
             chai.expect(data.bookData).to.be.match(/[/s]*.*[/s]*/);
             done();

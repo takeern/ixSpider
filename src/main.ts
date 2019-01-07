@@ -1,5 +1,11 @@
 import Spider from './component/index';
+import IxSpider from '../src/component/ixSpider';
 
+const spider = new IxSpider();
+
+spider.searchBook({
+    bookName: '大道朝天',
+});
 export {
     Spider
 };
