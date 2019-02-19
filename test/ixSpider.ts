@@ -4,15 +4,14 @@ import IxSpider from '../src/component/ixSpider';
 
 const bookName = '大道朝天';
 const spider = new IxSpider();
-const bookNumber = '/d/169/169208/#epub_down';
+const bookNumber = '/d/169/169208/';
 describe('ixSpider input bookname should renturn book number', function() {
     this.timeout(15000);
     it('ixSpider input bookname should return book number', function(done) {
         spider.searchBook({
             bookName,
         }).then((data) => {
-            console.log(data)
-            chai.expect(data[0].bookNumber).to.be.equal('/d/169/169208/#txt_down');
+            chai.expect(data[0].bookNumber).to.be.equal('/d/169/169208/');
             done();
         });
     });

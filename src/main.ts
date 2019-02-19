@@ -3,15 +3,17 @@ import IxSpider from '../src/component/ixSpider';
 
 const spider = new IxSpider();
 
-spider.searchBook({
-    bookName: '大道朝天',
+// export {
+//     Spider
+// };
+
+const bookName = 'dahsjkdas';
+spider.getBookData({
+    bookNumber: '/d/169/169208/',
+    bookHref: 'p3.html',
+}).then((data) => {
+    console.log(data);
 });
-export {
-    Spider
-};
-
-// const bookName = 'dahsjkdas';
-
 // const spider = new Spider({
 //     bookName: bookName,
 // });

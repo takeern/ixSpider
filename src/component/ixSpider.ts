@@ -1,6 +1,7 @@
-require('isomorphic-fetch');
+const fetch = require("node-fetch");
 const unzip = require('unzip');
 const request = require('request');
+const HttpProxyAgent = require('http-proxy-agent');
 
 // lib
 import { ixdzs } from '../ulits/API';
@@ -93,8 +94,13 @@ export default  class IxSpider extends ABSpider {
             throw new Error('bookNumber is undefined');
         }
         const arr = bookNumber.split('/');
+        const ip = '144.123.70.15';
+        const port = '9999';
         const html: string = await fetch(`${ixdzs.getList}${arr[2]}/${arr[3]}/${config.bookHref}`, {
             method: 'GET',
+            timeout: 10000,
+            redirect: 'follow',
+            // agent: new HttpProxyAgent('http://' + ip + ':' + port),
         }).then((res) => {
             return res.text();
         });
