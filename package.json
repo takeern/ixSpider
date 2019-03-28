@@ -14,8 +14,12 @@
     "@types/node": "^10.12.14",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "iconv-lite": "^0.4.24",
     "isomorphic-fetch": "^2.2.1",
+    "node-fetch": "^2.3.0",
     "request": "^2.88.0",
+    "rxjs": "^6.4.0",
+    "rxjs-compat": "^6.4.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2",
     "unzip": "^0.1.11"

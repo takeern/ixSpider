@@ -29,6 +29,15 @@ interface ISearchBook {
     bookIntro: string;
     bookState: string;
 }
+
+interface IDownloadBook {
+    title?: string;
+    tableLen?: number;
+    webLen?: string;
+    tableOffet?: number;
+    tableData?: string;
+}
+
 export {
     ISpiderConfig,
     IBookListRes,
@@ -36,4 +45,5 @@ export {
     IBookData,
     IBookList,
     ISearchBook,
+    IDownloadBook
 };

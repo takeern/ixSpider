@@ -1,18 +1,18 @@
-const fetch = require("node-fetch");
+const fetch = require('node-fetch');
 const unzip = require('unzip');
 const request = require('request');
-const HttpProxyAgent = require('http-proxy-agent');
-
+const Rx = require('rxjs/Rx');
 // lib
 import { ixdzs } from '../ulits/API';
 import ERROR from '../ulits/Error';
 
 // interface
-import { ISpiderConfig, IBookList, ISearchBook } from '../interface/config';
+import { ISpiderConfig, IBookList, ISearchBook, IDownloadBook } from '../interface/config';
 import { IsearchConfig } from '../interface/Spider';
 import ABSpider from './Spider';
 
-export default  class IxSpider extends ABSpider {
+// export default  class IxSpider extends ABSpider {
+export default  class IxSpider {
     // public bookName: string;
     // public indentif: string;
     // public bookNumber: string;
@@ -29,7 +29,7 @@ export default  class IxSpider extends ABSpider {
         }
         const html: string = await fetch(ixdzs.searchBookNumber + encodeURI(bookName), {
             method: 'GET',
-        }).then((res) => {
+        }).then((res: any) => {
             if (!res.ok) {
                 throw new Error(ERROR.GETBOOKNUMBE);
             }
@@ -60,7 +60,7 @@ export default  class IxSpider extends ABSpider {
         const arr = bookNumber.split('/');
         const html: string = await fetch(`${ixdzs.getList}${arr[2]}/${arr[3]}/`, {
             method: 'GET',
-        }).then((res) => {
+        }).then((res: any) => {
             if (!res.ok) {
                 throw new Error(ERROR.GETLIST);
             }
@@ -101,7 +101,7 @@ export default  class IxSpider extends ABSpider {
             timeout: 10000,
             redirect: 'follow',
             // agent: new HttpProxyAgent('http://' + ip + ':' + port),
-        }).then((res) => {
+        }).then((res: any) => {
             return res.text();
         });
         const re = /<div class="content">([\w\W]*?)<\/div>/g;
@@ -114,22 +114,107 @@ export default  class IxSpider extends ABSpider {
     /**
      * 下载整本书
      */
-    public async getBookAllData(config: IsearchConfig) {
-        const bookNumber = config.bookNumber;
+    public async getBookAllData(config: IsearchConfig, bookList: Array<IBookList>) {
+        const { bookNumber } = config;
         if (!bookNumber) {
             throw new Error('bookNumber is undefined');
         }
-        const arr = bookNumber.split('/');
-        const url = `${ixdzs.download}/down/${arr[3]}_1`;
-        return new Promise((resolve) => {
-            try {
-                request(url).pipe(unzip.Parse())
-                    .on('entry', function(entry: any) {
-                        resolve(entry);
+        // /d/169/169208/#epub_down
+        const url = ixdzs.download + bookNumber.split('/')[3] + '&p=1';
+        return Rx.Observable.create(async (observer: any) => {
+            const buffer = [];
+            let sum = 0;
+            request(url)
+            .pipe(unzip.Parse())
+            .on('entry', function(entry: any) {
+                entry.read();
+                entry.on('data', (data: any) => {
+                    if (!data) {
+                        return;
+                    }
+                    buffer.push(data);
+                    sum += data.length;
+                    observer.next({
+                        type: 'test',
+                        data: data,
                     });
-            } catch (e) {
-                throw new Error(ERROR.GETBOOKALLDATA);
-            }
+                    // const book: Array<IDownloadBook> = [];
+                    // const tableIndex = [];
+                    // // console.log(iconv.decode(data, 'gbk'));
+                    // let str = iconv.decode(data, 'gbk');
+                    // if (str.length === 0) {
+                    //     return;
+                    // }
+                    // str = stash + str;
+                    // stash = '';
+                    // for (let i = lastIndex; i < bookList.length; i++) {
+                    //     // let strIndex;
+                    //     const offsetIndex: number = i === lastIndex ? 0 : tableIndex[tableIndex.length - 1].offset;
+                    //     const offset = str.indexOf(bookList[i].title, offsetIndex);
+                    //     if (offset === -1) {
+                    //         break;
+                    //     }
+                    //     tableIndex.push({
+                    //         offset,
+                    //         title: bookList[i].title,
+                    //         webLen: bookList[i].length,
+                    //     });
+                    // }
+                    // for (let i = 0; i < tableIndex.length; i++) {
+                    //     if (i === 0) {
+                    //         continue;
+                    //     }
+                    //     const lastOffset = tableIndex[i - 1].offset;
+                    //     const nowOffset = tableIndex[i].offset;
+                    //     const tableData = str.slice(lastOffset, nowOffset);
+                    //     const tableLen = nowOffset - lastOffset;
+                    //     const tableOffet = i + lastIndex;
+                    //     listState[tableOffet] = 1;
+                    //     book.push({
+                    //         title: tableIndex[i - 1].title,
+                    //         tableLen,
+                    //         webLen: tableIndex[i - 1].webLen,
+                    //         tableOffet,
+                    //         tableData,
+                    //     });
+                    // }
+                    // if (tableIndex.length !== 0) {
+                    //     const lastStr = str.slice(tableIndex[tableIndex.length - 1].offset);
+                    //     stash += lastStr;
+                    //     lastIndex = lastIndex + tableIndex.length - 1;
+                    // }
+                    // sendLength += book.length;
+                    // sendBook.push(book);
+                    // if (sendLength > 100) {
+                    //     sendLength = 0;
+                    //     observer.next({
+                    //         type: 'bookData',
+                    //         data: Array.prototype.concat.apply([], sendBook),
+                    //     });
+                    //     Array.prototype.concat.apply([], sendBook).map(item => console.log(item.title));
+                    //     sendBook.length = 0;
+                    // }
+                });
+                entry.on('end', () => {
+                    console.log('done');
+                    // if (sendLength !== 0) {
+                    //     sendLength = 0;
+                    //     observer.next({
+                    //         type: 'bookData',
+                    //         data: Array.prototype.concat.apply([], sendBook),
+                    //     });
+                    //     Array.prototype.concat.apply([], sendBook).map(item => console.log(item.title));
+                    //     sendBook.length = 0;
+                    // }
+                    // observer.next({
+                    //     type: 'bookState',
+                    //     data: listState,
+                    // });
+                    const b = Buffer.concat(buffer);
+                    console.log(b.length, sum);
+                    observer.complete();
+                });
+            });
         });
     }
 }

@@ -7,10 +7,15 @@ const spider = new IxSpider();
 //     Spider
 // };
 
-const bookName = 'dahsjkdas';
-spider.getBookData({
+// const bookName = 'dahsjkdas';
+// spider.getBookData({
+//     bookNumber: '/d/169/169208/',
+//     bookHref: 'p3.html',
+// }).then((data) => {
+//     console.log(data);
+// });
+spider.getBookAllData({
     bookNumber: '/d/169/169208/',
-    bookHref: 'p3.html',
 }).then((data) => {
     console.log(data);
 });

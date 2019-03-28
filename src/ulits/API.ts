@@ -17,7 +17,7 @@ enum ixdzs {
     /**
      * 下载地址
      */
-    download = 'https://www.ixdzs.com/',
+    download = 'https://www.ixdzs.com/down?id=',
 }
 
 export {
