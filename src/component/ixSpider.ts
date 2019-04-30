@@ -106,10 +106,28 @@ export default  class IxSpider {
         });
         const re = /<div class="content">([\w\W]*?)<\/div>/g;
         const res = re.exec(html);
-        return {
-            bookData: res[1],
-            bookNumber,
-        };
+        // return {
+        //     bookData: res[1],
+        //     bookNumber,
+        // };
+        return Rx.Observable.create((observer: any) => {
+            const length = res[1].length;
+            const times = Math.floor(length / 600) + 1;
+            let i = 0;
+            while(i < times) {
+                const start = i * 600;
+                const end = start + 600 > length ? length : start + 600;
+                const data = res[1].slice(start, end);
+                console.log(data);
+                observer.next(data);
+                i++;
+                console.log(i);
+            }
+            // setTimeout(() => {
+            //     console.log('complete');
+            //     observer.complete();
+            // }, 1000)
+        })
     }
     /**
      * 下载整本书

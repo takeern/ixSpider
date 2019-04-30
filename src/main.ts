@@ -14,11 +14,7 @@ const spider = new IxSpider();
 // }).then((data) => {
 //     console.log(data);
 // });
-spider.getBookAllData({
-    bookNumber: '/d/169/169208/',
-}).then((data) => {
-    console.log(data);
-});
+// 
 // const spider = new Spider({
 //     bookName: bookName,
 // });
